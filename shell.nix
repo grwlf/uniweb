@@ -53,6 +53,7 @@ let
       # pyls-black
 
       # Selenium-related stuff
+      pyyaml
       virtual-display
       xorg.xorgserver
       selenium

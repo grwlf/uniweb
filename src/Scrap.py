@@ -1,3 +1,6 @@
+import re
+import yaml
+
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait # available since 2.4.0
 from selenium.webdriver.support import expected_conditions as EC # available since 2.26.0
@@ -40,11 +43,28 @@ class Driver:
   def __exit__(self,exc_type, exc_value, traceback):
     _driver_quit(self.driver)
 
-def test():
+URL_DEF="https://habr.com/ru/company/jugru/blog/455936/"
+
+def run(url:str=URL_DEF):
   """ Open display and samples chat messages """
+  fname=re.sub('[^\w\s]', '_', url)+".yaml"
   with Display(True) as disp, Driver() as driver:
-    driver.get("https://habr.com/ru/company/jugru/blog/455936/")
-    print('Im here')
-    divs=driver.find_elements(By.XPATH,"//div");
-    for div in divs:
-      print(div, div.text)
+    print('Navigating to', url)
+    driver.get(url)
+    print('Searching elements')
+    divs=driver.find_elements(By.XPATH,"//div")
+    print('Dumping...')
+    page=[]
+    for i,div in enumerate(divs):
+      # page.append({'id':div.id, 'rect':div.rect, 'inner':div.get_attribute('innerHTML')})
+      page.append({'id':div.id, 'rect':div.rect, 'text':div.text})
+      if i%10 == 0:
+        print(i)
+    with open(fname,'w') as f:
+      yaml.dump(page,f)
+    print('Done, check', fname)
+    return fname
+
+
+
+
